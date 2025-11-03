@@ -1,3 +1,4 @@
+/*Tested your code , its perfect -Rishabh*/
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
