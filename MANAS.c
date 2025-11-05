@@ -17,11 +17,13 @@ struct Booking {
     int seat_no;
     int active;
 } Bookings[1000] = {
-    {"PNR1001", 101, "Rohit Sharma", 32, "Male", 1, 1},
-    {"PNR1002", 102, "Neha Singh", 27, "Female", 1, 1},
-    {"PNR1003", 103, "Amit Patel", 40, "Male", 2, 1},
-    {"PNR1004", 104, "Priya Verma", 29, "Female", 3, 1}
+    {"PNR1001", 101, "Rohit Sharma", 32, "M", 1, 1},
+    {"PNR1002", 102, "Neha Singh", 27, "F", 1, 1},
+    {"PNR1003", 103, "Amit Patel", 40, "M", 2, 1},
+    {"PNR1004", 104, "Priya Verma", 29, "F", 3, 1}
 };
+
+
 
 int booking_count = 4;
 
@@ -32,6 +34,27 @@ void add_train(train Trains[], int*);
 //void update_train(trian, int);
 //void delete_train(trian, int*);
 void view_all_trains(train Trains[], int);
+void view_all_bookings() {
+    if (booking_count == 0) {
+        printf("\nNo bookings available.\n");
+        return;
+    }
+
+    printf("\n%-10s %-10s %-20s %-5s %-10s %-8s %-10s\n",
+           "PNR", "Train No", "Passenger Name", "Age", "Gender", "Seat", "Status");
+    printf("--------------------------------------------------------------------------\n");
+
+    for (int i = 0; i < booking_count; i++) {
+        printf("%-10s %-10d %-20s %-5d %-10s %-8d %-10s\n",
+               Bookings[i].pnr,
+               Bookings[i].train_number,
+               Bookings[i].passenger_name,
+               Bookings[i].age,
+               Bookings[i].gender,
+               Bookings[i].seat_no,
+               Bookings[i].active ? "CONFIRMED" : "CANCELLED");
+    }
+}
 int Admin_Menu(train *Trains,int *train_count) {
     int choice;
     while (1) {
@@ -41,7 +64,8 @@ int Admin_Menu(train *Trains,int *train_count) {
         printf("3. Search Train\n");
         printf("4. Update Train\n");
         printf("5. Delete Train\n");
-        printf("6. Exit\n");
+        printf("6. View all bookings\n");
+        printf("7. Exit\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
         if (choice == 1) {
@@ -60,6 +84,9 @@ int Admin_Menu(train *Trains,int *train_count) {
             delete_train(Trains, &train_count);
         }*/
         else if (choice == 6) {
+            view_all_bookings();
+        }
+        else if(choice ==7){
             break;
         }
         else {
