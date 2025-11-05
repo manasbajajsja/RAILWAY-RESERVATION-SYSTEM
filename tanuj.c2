@@ -1,0 +1,196 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef struct {
+    int train_no;
+    char name[50];
+    char from[30];
+    char to[30];
+    int total_seats;
+    int booked_seats;
+    float fare;
+} Train;
+
+typedef struct {
+    long pnr;
+    int train_no;
+    char passenger_name[50];
+    int seat_no;
+    int is_cancelled;  
+    float amount;
+} Booking;
+
+#define TRAIN_FILE "trains.dat"
+#define BOOKING_FILE "bookings.dat"
+
+void cancel_booking();
+void check_availability();
+int find_train_index(Train trains[], int count, int train_no);
+int load_trains(Train trains[]);
+int load_bookings(Booking bookings[]);
+void save_trains(Train trains[], int count);
+void save_bookings(Booking bookings[], int count);
+void press_enter_to_continue();
+
+int load_trains(Train trains[]) {
+    FILE *fp = fopen(TRAIN_FILE, "rb");
+    if (fp == NULL) {
+        printf("\n No train file found, starting fresh.\n");
+        return 0;
+    }
+    int count = fread(trains, sizeof(Train), 50, fp);
+    fclose(fp);
+    return count;
+}
+
+int load_bookings(Booking bookings[]) {
+    FILE *fp = fopen(BOOKING_FILE, "rb");
+    if (fp == NULL) {
+        printf("\n No booking file found, starting fresh.\n");
+        return 0;
+    }
+    int count = fread(bookings, sizeof(Booking), 100, fp);
+    fclose(fp);
+    return count;
+}
+
+void save_trains(Train trains[], int count) {
+    FILE *fp = fopen(TRAIN_FILE, "wb");
+    if (fp == NULL) {
+        printf("Error saving train data!\n");
+        return;
+    }
+    fwrite(trains, sizeof(Train), count, fp);
+    fclose(fp);
+}
+
+void save_bookings(Booking bookings[], int count) {
+    FILE *fp = fopen(BOOKING_FILE, "wb");
+    if (fp == NULL) {
+        printf("Error saving booking data!\n");
+        return;
+    }
+    fwrite(bookings, sizeof(Booking), count, fp);
+    fclose(fp);
+}
+
+int find_train_index(Train trains[], int count, int train_no) {
+    for (int i = 0; i < count; i++) {
+        if (trains[i].train_no == train_no)
+            return i;
+    }
+    return -1; 
+}
+
+void check_availability() {
+    Train trains[50];
+    int train_count = load_trains(trains);
+
+    printf("\n==================== TRAIN AVAILABILITY ====================\n");
+
+    if (train_count == 0) {
+        printf("\nNo trains available yet. Ask admin to add trains.\n");
+        press_enter_to_continue();
+        return;
+    }
+
+    printf("%-10s %-20s %-10s %-10s %-10s %-10s\n",
+           "Train No", "Train Name", "From", "To", "Total", "Available");
+
+    for (int i = 0; i < train_count; i++) {
+        int available = trains[i].total_seats - trains[i].booked_seats;
+        printf("%-10d %-20s %-10s %-10s %-10d %-10d\n",
+               trains[i].train_no, trains[i].name, trains[i].from,
+               trains[i].to, trains[i].total_seats, available);
+    }
+
+    press_enter_to_continue();
+}
+
+void cancel_booking() {
+    Train trains[50];
+    Booking bookings[100];
+    int train_count = load_trains(trains);
+    int booking_count = load_bookings(bookings);
+
+    if (booking_count == 0) {
+        printf("\nNo bookings found.\n");
+        press_enter_to_continue();
+        return;
+    }
+
+    long pnr;
+    printf("\n==================== CANCEL BOOKING ====================\n");
+    printf("Enter your PNR number: ");
+    scanf("%ld", &pnr);
+
+    int found = 0;
+
+    for (int i = 0; i < booking_count; i++) {
+        if (bookings[i].pnr == pnr) {
+            found = 1;
+
+            if (bookings[i].is_cancelled == 1) {
+                printf("\n This booking is already cancelled.\n");
+                break;
+            }
+
+            bookings[i].is_cancelled = 1;
+            int t_index = find_train_index(trains, train_count, bookings[i].train_no);
+            if (t_index != -1) {
+                trains[t_index].booked_seats -= 1;
+            }
+            save_bookings(bookings, booking_count);
+            save_trains(trains, train_count);
+
+            printf("\n booking cancelled successfully!\n");
+            printf("PNR: %ld\n", bookings[i].pnr);
+            printf("Passenger: %s\n", bookings[i].passenger_name);
+            printf("Refund Amount: ₹%.2f\n", bookings[i].amount * 0.8);
+            break;
+        }
+    }
+
+    if (!found) {
+        printf("\n no booking found for PNR %ld.\n", pnr);
+    }
+
+    press_enter_to_continue();
+}
+
+void press_enter_to_continue() {
+    printf("\nPress Enter to continue...");
+    getchar();
+    getchar();
+}
+
+int main() {
+    int choice;
+
+    do {
+        printf("\n\n===== CANCELLATION & AVAILABILITY MODULE =====\n");
+        printf("1. Check Seat Availability\n");
+        printf("2. Cancel Booking\n");
+        printf("3. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                check_availability();
+                break;
+            case 2:
+                cancel_booking();
+                break;
+            case 3:
+                printf("\nThank you for using the system!\n");
+                break;
+            default:
+                printf("Invalid choice! Try again.\n");
+        }
+
+    } while (choice != 3);
+
+    return 0;
+}
