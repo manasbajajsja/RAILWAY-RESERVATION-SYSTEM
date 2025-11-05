@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 typedef struct {
     int train_no;
     char name[50];
@@ -11,7 +10,6 @@ typedef struct {
     int booked_seats;
     float fare;
 } Train;
-
 typedef struct {
     long pnr;
     int train_no;
@@ -20,7 +18,6 @@ typedef struct {
     int is_cancelled;  
     float amount;
 } Booking;
-
 #define TRAIN_FILE "trains.dat"
 #define BOOKING_FILE "bookings.dat"
 
