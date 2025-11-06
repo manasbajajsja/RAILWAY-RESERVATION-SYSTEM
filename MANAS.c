@@ -30,9 +30,9 @@ int booking_count = 4;
 #define MAX_TRAINS 100
 
 void add_train(train Trains[], int*);
-//void search_train(trian, int);
-//void update_train(trian, int);
-//void delete_train(trian, int*);
+void search_train(train*t, int count);
+void update_train(train*t, int count);
+void delete_train(train*t, int*count);
 void view_all_trains(train Trains[], int);
 void view_all_bookings() {
     if (booking_count == 0) {
@@ -55,6 +55,86 @@ void view_all_bookings() {
                Bookings[i].active ? "CONFIRMED" : "CANCELLED");
     }
 }
+void search_train(train *t, int count) {
+    int t_num;
+    int found = 0;
+    printf("Enter train number to search it's details: ");
+    scanf("%d", &t_num);
+    for (int i = 0; i < count; i++) {
+        if (t[i].train_number == t_num) {
+            found = 1;
+            printf("Train Found!!\n");
+            printf("Train Number: %d\n", t[i].train_number);
+            printf("Train Name: %s\n", t[i].train_name);
+            printf("Source: %s\n", t[i].source);
+            printf("Destination: %s\n", t[i].destination);
+            printf("Total Seats: %d\n", t[i].seats);
+        }
+    }
+    if (found == 1) {
+        printf("Train Details Fetched Successfully!!");
+    }
+    else {
+        printf("Train does not exist!!");
+    }
+}
+void update_train(train *t, int count) {
+    int t_num;
+    int found = 0;
+    printf("Enter train number to update it's details: ");
+    scanf("%d", &t_num);
+    for (int i = 0; i < count; i++) {
+        if (t[i].train_number == t_num) {
+            found = 1;
+            printf("Train Found!!\n");
+            printf("Enter New Train Number: ");
+            scanf("%d", &t[i].train_number);
+            getchar();
+
+            printf("Enter New Train Name: ");
+            fgets(t[i].train_name, sizeof(t[i].train_name), stdin);
+            t[i].train_name[strcspn(t[i].train_name, "\n")] = '\0';
+
+            printf("Enter New Source: ");
+            fgets(t[i].source, sizeof(t[i].source), stdin);
+            t[i].source[strcspn(t[i].source, "\n")] = '\0';
+
+            printf("Enter New Destination: ");
+            fgets(t[i].destination, sizeof(t[i].destination), stdin);
+            t[i].destination[strcspn(t[i].destination, "\n")] = '\0';
+
+            printf("Enter New Total Seats of Train: ");
+            scanf("%d", &t[i].seats);
+        }
+    }
+    if (found == 1) {
+        printf("Train Details Updatted Successfully!!");
+    }
+    else {
+        printf("Train does not exist!!");
+    }
+}
+void delete_train(train *t, int *count) {
+    int t_num;
+    int found = 0;
+    printf("Enter train number to delete it's details: ");
+    scanf("%d", &t_num);
+    for (int i = 0; i < *count; i++) {
+        if (t[i].train_number == t_num) {
+            found = 1;
+            for (int j = i; j < *count; j++) {
+                t[j] = t[j+1];
+            }
+            (*count)--;
+        }
+    }
+    if (found == 1) {
+        printf("Train Details Deleted Successfully!!");
+    }
+    else {
+        printf("Train does not exist!!");
+    }
+}
 int Admin_Menu(train *Trains,int *train_count) {
     int choice;
     while (1) {
@@ -74,15 +154,15 @@ int Admin_Menu(train *Trains,int *train_count) {
         else if (choice == 2) {
             view_all_trains(Trains, *train_count);
         }
-        /*else if (choice == 3) {
-            search_train(Trains, train_count);
+        else if (choice == 3) {
+            search_train(Trains, *train_count);
         }
         else if (choice == 4) {
-            update_train(Trains, train_count);
+            update_train(Trains, *train_count);
         }
         else if (choice == 5) {
-            delete_train(Trains, &train_count);
-        }*/
+            delete_train(Trains, train_count);
+        }
         else if (choice == 6) {
             view_all_bookings();
         }
@@ -90,7 +170,7 @@ int Admin_Menu(train *Trains,int *train_count) {
             break;
         }
         else {
-            printf("Invalid choice!! Enter Choice from (1 to 6)\n");
+            printf("Invalid choice!! Enter Choice from (1 to 7)\n");
         }
     }
     return 0;
