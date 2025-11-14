@@ -47,6 +47,10 @@ void view_all_bookings(int *booking_count,struct Booking *Bookings) {
                Bookings[i].active ? "CONFIRMED" : "CANCELLED");
     }
 }
+void clear_input(void) {
+    int ch;
+    while ((ch = getchar()) != '\n' && ch != EOF) {}
+}
 int Admin_Menu(int *train_count,train *Trains,int *booking_count,struct Booking *Bookings) {
     int choice;
     while (1) {
@@ -64,6 +68,7 @@ int Admin_Menu(int *train_count,train *Trains,int *booking_count,struct Booking 
         scanf("%d", &choice);
         if (choice == 1) {
             add_train(Trains, train_count);
+            clear_input();
         }
         else if (choice == 2) {
             view_all_trains(Trains, *train_count);
@@ -73,9 +78,11 @@ int Admin_Menu(int *train_count,train *Trains,int *booking_count,struct Booking 
         }
         else if (choice == 4) {
             update_train(Trains,*train_count);
+            clear_input();
         }
         else if (choice == 5) {
             delete_train(Trains, train_count);
+            clear_input();
         }
         else if(choice==6){
             view_all_bookings(booking_count,Bookings);
@@ -140,10 +147,10 @@ void search_train(train *t, int count) {
         }
     }
     if (found == 1) {
-        printf("Train Details Fetched Successfully!!");
+        printf("Train Details Fetched Successfully!!\n");
     }
     else {
-        printf("Train does not exist!!");
+        printf("Train does not exist!!\n");
     }
 }
 void update_train(train *t, int count) {
@@ -176,10 +183,10 @@ void update_train(train *t, int count) {
         }
     }
     if (found == 1) {
-        printf("Train Details Updatted Successfully!!");
+        printf("Train Details Updatted Successfully!!\n");
     }
     else {
-        printf("Train does not exist!!");
+        printf("Train does not exist!!\n");
     }
 }
 void delete_train(train *t, int *count) {
@@ -197,15 +204,11 @@ void delete_train(train *t, int *count) {
         }
     }
     if (found == 1) {
-        printf("Train Details Deleted Successfully!!");
+        printf("Train Details Deleted Successfully!!\n");
     }
     else {
-        printf("Train does not exist!!");
+        printf("Train does not exist!!\n");
     }
-}
-void clear_input(void) {
-    int ch;
-    while ((ch = getchar()) != '\n' && ch != EOF) {}
 }
 int find_train_index_by_no(train *Trains, int train_count, int train_no) {
     for (int i = 0; i < train_count; i++) {
