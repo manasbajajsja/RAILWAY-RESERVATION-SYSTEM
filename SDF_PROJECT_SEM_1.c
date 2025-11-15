@@ -501,11 +501,11 @@ int main(){
     FILE *fpu;
     fpt=fopen("Trains.txt","w");
     if (fpt==NULL){
-        printf("no fpt\n");
+        printf("Couldnt open Trains\n");
     }
     fpu=fopen("User.txt","w");
     if (fpu==NULL){
-        printf("no fpu\n");
+        printf("Couldnt open User\n");
     }
     fprintf(fpt,"\n%-10s %-20s %-15s %-15s %-10s\n", "Train No", "Train Name", "Source", "Destination", "Total Seats");
     fprintf(fpt,"---------------------------------------------------------------------------\n");
