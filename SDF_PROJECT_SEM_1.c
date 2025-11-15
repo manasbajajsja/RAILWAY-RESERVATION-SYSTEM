@@ -21,10 +21,10 @@ struct Booking {
 
 #define MAX_TRAINS 100
 
-void add_train(train *, int*);
+void add_train(train *, int*,FILE *);
 void search_train(train *, int);
-void update_train(train *, int);
-void delete_train(train *, int*);
+void update_train(train *, int,FILE *);
+void delete_train(train *, int*,FILE *);
 void view_all_trains(train *, int);
 void view_all_bookings(int *booking_count,struct Booking *Bookings) {
     if (*booking_count == 0) {
@@ -51,7 +51,7 @@ void clear_input(void) {
     int ch;
     while ((ch = getchar()) != '\n' && ch != EOF) {}
 }
-int Admin_Menu(int *train_count,train *Trains,int *booking_count,struct Booking *Bookings) {
+int Admin_Menu(int *train_count,train *Trains,int *booking_count,struct Booking *Bookings,FILE *fpt) {
     int choice;
     while (1) {
         printf("================================");
@@ -67,7 +67,7 @@ int Admin_Menu(int *train_count,train *Trains,int *booking_count,struct Booking 
         printf("Enter your choice: ");
         scanf("%d", &choice);
         if (choice == 1) {
-            add_train(Trains, train_count);
+            add_train(Trains, train_count,fpt);
             clear_input();
         }
         else if (choice == 2) {
@@ -77,11 +77,11 @@ int Admin_Menu(int *train_count,train *Trains,int *booking_count,struct Booking 
             search_train(Trains,*train_count);
         }
         else if (choice == 4) {
-            update_train(Trains,*train_count);
+            update_train(Trains,*train_count,fpt);
             clear_input();
         }
         else if (choice == 5) {
-            delete_train(Trains, train_count);
+            delete_train(Trains, train_count,fpt);
             clear_input();
         }
         else if(choice==6){
@@ -96,7 +96,7 @@ int Admin_Menu(int *train_count,train *Trains,int *booking_count,struct Booking 
     }
     return 0;
 }
-void add_train(train *t, int *count) {
+void add_train(train *t, int *count,FILE *fpt) {
     if (*count == MAX_TRAINS) {
         printf("Limit Reached!! No more trains can be added.");
         return;
@@ -121,6 +121,14 @@ void add_train(train *t, int *count) {
     scanf("%d", &t[*count].seats);
     (*count)++;
     printf("Train Added Successfully!!\n");
+    fpt=fopen("Trains.txt","w");
+    fprintf(fpt,"\n%-10s %-20s %-15s %-15s %-10s\n", "Train No", "Train Name", "Source", "Destination", "Total Seats");
+    fprintf(fpt,"---------------------------------------------------------------------------\n");
+    for (int i=0;i<*count;i+=1){
+        fprintf(fpt,"%-10d %-20s %-15s %-15s %-10d\n", t[i].train_number,
+        t[i].train_name, t[i].source, t[i].destination, t[i].seats);
+    }
+    fclose(fpt);
 }
 
 void view_all_trains(train *t, int count) {
@@ -153,7 +161,7 @@ void search_train(train *t, int count) {
         printf("Train does not exist!!\n");
     }
 }
-void update_train(train *t, int count) {
+void update_train(train *t, int count,FILE *fpt) {
     int t_num;
     int found = 0;
     printf("Enter train number to update it's details: ");
@@ -188,8 +196,16 @@ void update_train(train *t, int count) {
     else {
         printf("Train does not exist!!\n");
     }
+    fpt=fopen("Trains.txt","w");
+    fprintf(fpt,"\n%-10s %-20s %-15s %-15s %-10s\n", "Train No", "Train Name", "Source", "Destination", "Total Seats");
+    fprintf(fpt,"---------------------------------------------------------------------------\n");
+    for (int i=0;i<count;i+=1){
+        fprintf(fpt,"%-10d %-20s %-15s %-15s %-10d\n", t[i].train_number,
+        t[i].train_name, t[i].source, t[i].destination, t[i].seats);
+    }
+    fclose(fpt);
 }
-void delete_train(train *t, int *count) {
+void delete_train(train *t, int *count,FILE *fpt) {
     int t_num;
     int found = 0;
     printf("Enter train number to delete it's details: ");
@@ -209,6 +225,14 @@ void delete_train(train *t, int *count) {
     else {
         printf("Train does not exist!!\n");
     }
+    fpt=fopen("Trains.txt","w");
+    fprintf(fpt,"\n%-10s %-20s %-15s %-15s %-10s\n", "Train No", "Train Name", "Source", "Destination", "Total Seats");
+    fprintf(fpt,"---------------------------------------------------------------------------\n");
+    for (int i=0;i<*count;i+=1){
+        fprintf(fpt,"%-10d %-20s %-15s %-15s %-10d\n", t[i].train_number,
+        t[i].train_name, t[i].source, t[i].destination, t[i].seats);
+    }
+    fclose(fpt);
 }
 int find_train_index_by_no(train *Trains, int train_count, int train_no) {
     for (int i = 0; i < train_count; i++) {
@@ -269,7 +293,7 @@ void show_availability(train *Trains, int train_count,int *booking_count,struct 
     printf("Booked seats  : %d\n", booked);
     printf("Available seats: %d\n", available);
 }
-void book_ticket(train *Trains, int train_count,int *booking_count,struct Booking *Bookings) {
+void book_ticket(train *Trains, int train_count,int *booking_count,struct Booking *Bookings,FILE *fpu) {
     if (*booking_count >= 1000) {
         printf("Sorry, booking list is full!\n");
         return;
@@ -332,8 +356,20 @@ void book_ticket(train *Trains, int train_count,int *booking_count,struct Bookin
            Trains[idx].source, Trains[idx].destination);
     printf("Passenger: %s, Age: %d, Gender: %s\n", b.passenger_name, b.age, b.gender);
     printf("Seat No: %d\n", b.seat_no);
+    fpu=fopen("User.txt","w");
+    for (int i=0;i<*booking_count;i+=1){
+        fprintf(fpu,"==========\n");
+        fprintf(fpu,"\nPNR: %s\n", Bookings[i].pnr);
+        fprintf(fpu,"Train No: %d\n", Bookings[i].train_number);
+        fprintf(fpu,"Passenger: %s, Age: %d, Gender: %s\n",
+                   Bookings[i].passenger_name, Bookings[i].age, Bookings[i].gender);
+        fprintf(fpu,"Seat No: %d\n", Bookings[i].seat_no);
+        fprintf(fpu,"Status: %s\n", Bookings[i].active ? "CONFIRMED" : "CANCELLED");
+        fprintf(fpu,"==========\n");
+    }
+    fclose(fpu);
 }
-void cancel_booking(int *booking_count,struct Booking *Bookings) {
+void cancel_booking(int *booking_count,struct Booking *Bookings,FILE *fpu) {
     if (*booking_count == 0) {
         printf("No bookings present.\n");
         return;
@@ -352,6 +388,18 @@ void cancel_booking(int *booking_count,struct Booking *Bookings) {
             }
             Bookings[i].active = 0;
             printf("Booking with PNR %s cancelled successfully.\n", pnr);
+            fpu=fopen("User.txt","w");
+            for (int i=0;i<*booking_count;i+=1){
+                fprintf(fpu,"==========\n");
+                fprintf(fpu,"\nPNR: %s\n", Bookings[i].pnr);
+                fprintf(fpu,"Train No: %d\n", Bookings[i].train_number);
+                fprintf(fpu,"Passenger: %s, Age: %d, Gender: %s\n",
+                           Bookings[i].passenger_name, Bookings[i].age, Bookings[i].gender);
+                fprintf(fpu,"Seat No: %d\n", Bookings[i].seat_no);
+                fprintf(fpu,"Status: %s\n", Bookings[i].active ? "CONFIRMED" : "CANCELLED");
+                fprintf(fpu,"==========\n");
+            }
+            fclose(fpu);
             return;
         }
     }
@@ -383,7 +431,7 @@ void view_booking_by_pnr(int *booking_count,struct Booking *Bookings) {
     printf("PNR not found.\n");
 }
 
-void User_menu(train *Trains, int train_count,int *booking_count,struct Booking *Bookings) {
+void User_menu(train *Trains, int train_count,int *booking_count,struct Booking *Bookings,FILE *fpu) {
     int choice;
 
     while (1) {
@@ -416,11 +464,11 @@ void User_menu(train *Trains, int train_count,int *booking_count,struct Booking 
                 break;
 
             case 3:
-                book_ticket(Trains, train_count,booking_count,Bookings);
+                book_ticket(Trains, train_count,booking_count,Bookings,fpu);
                 break;
 
             case 4:
-                cancel_booking(booking_count,Bookings);
+                cancel_booking(booking_count,Bookings,fpu);
                 break;
 
             case 5:
@@ -449,6 +497,34 @@ int main(){
     {"PNR1003", 103, "Amit Patel", 40, "M", 2, 1},
     {"PNR1004", 104, "Priya Verma", 29, "F", 3, 1}
     };
+    FILE *fpt;
+    FILE *fpu;
+    fpt=fopen("Trains.txt","w");
+    if (fpt==NULL){
+        printf("no fpt\n");
+    }
+    fpu=fopen("User.txt","w");
+    if (fpu==NULL){
+        printf("no fpu\n");
+    }
+    fprintf(fpt,"\n%-10s %-20s %-15s %-15s %-10s\n", "Train No", "Train Name", "Source", "Destination", "Total Seats");
+    fprintf(fpt,"---------------------------------------------------------------------------\n");
+    for (int i=0;i<train_count;i+=1){
+        fprintf(fpt,"%-10d %-20s %-15s %-15s %-10d\n", Trains[i].train_number,
+        Trains[i].train_name, Trains[i].source, Trains[i].destination, Trains[i].seats);
+    }
+    for (int i=0;i<booking_count;i+=1){
+        fprintf(fpu,"==========\n");
+        fprintf(fpu,"\nPNR: %s\n", Bookings[i].pnr);
+        fprintf(fpu,"Train No: %d\n", Bookings[i].train_number);
+        fprintf(fpu,"Passenger: %s, Age: %d, Gender: %s\n",
+                   Bookings[i].passenger_name, Bookings[i].age, Bookings[i].gender);
+        fprintf(fpu,"Seat No: %d\n", Bookings[i].seat_no);
+        fprintf(fpu,"Status: %s\n", Bookings[i].active ? "CONFIRMED" : "CANCELLED");
+        fprintf(fpu,"==========\n");
+    }
+    fclose(fpt);
+    fclose(fpu);
     while (1){
         printf("==========================================\n");
         printf("Welcome to the Railway Reservation System!\n");
@@ -460,10 +536,10 @@ int main(){
         printf("Enter your choice :");
         scanf("%d",&ch);
         if(ch==1){
-            Admin_Menu(&train_count,Trains,&booking_count,Bookings);
+            Admin_Menu(&train_count,Trains,&booking_count,Bookings,fpt);
         }
         else if(ch==2){
-            User_menu(Trains,train_count,&booking_count,Bookings);
+            User_menu(Trains,train_count,&booking_count,Bookings,fpu);
         }
         else if(ch==3){
             printf("==========\n");
@@ -475,4 +551,5 @@ int main(){
             printf("Wrong Input\n");
         }
     }
+    return 0;
 }
